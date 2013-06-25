@@ -43,7 +43,7 @@ Hoodie.Account = (function () {
   // Properties
   // ------------
 
-  // 
+  //
   Account.prototype.username = undefined;
 
   // init
@@ -204,7 +204,7 @@ Hoodie.Account = (function () {
   // hasAccount
   // ---------------------
 
-  // 
+  //
   Account.prototype.hasAccount = function() {
     return !!this.username;
   };
@@ -213,7 +213,7 @@ Hoodie.Account = (function () {
   // hasAnonymousAccount
   // ---------------------
 
-  // 
+  //
   Account.prototype.hasAnonymousAccount = function() {
     return this.getAnonymousPassword() !== undefined;
   };
@@ -276,6 +276,27 @@ Hoodie.Account = (function () {
         reauthenticated: true
       });
     }
+  };
+
+
+  // sign in with "provider"
+  // -----------------------
+
+  // uses providers to sign into an account. If the user account
+  // does not yet exist, it gets created automatically.
+  //
+  // Currently support is Mozilla's "persona". More to follow
+  //
+  Account.prototype.signInWith = function(providerName) {
+    var provider;
+
+    switch(providerName) {
+    case 'persona':
+      provider = new Hoodie.PersonaAccount(this);
+      return provider.signIn();
+    }
+
+    return this.hoodie.rejectWith({error: providerName + " is not yet supported."});
   };
 
 
@@ -616,7 +637,7 @@ Hoodie.Account = (function () {
 
     // _delayedSignIn might call itself, when the user account
     // is pending. In this case it passes the original defer,
-    // to keep a reference and finally resolve / reject it 
+    // to keep a reference and finally resolve / reject it
     // at some point
     if (!defer) {
       defer = this.hoodie.defer();
