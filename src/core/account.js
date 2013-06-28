@@ -40,6 +40,27 @@ Hoodie.Account = (function () {
     this.init();
   }
 
+
+  // Add Provider
+  // ---------------
+
+  // 3rd party providers to signUp/signIn can be added using the
+  // following syntax:
+  //
+  //     Hoodie.Account.addProvider('persona', function() {
+  //       ...
+  //     })
+  //
+  // Later the user can sign in using the code
+  //
+  //     hoodie.account.signInUsing('hoodie')
+  //
+  var providers = {};
+  Account.addProvider = function(providerName, providerClass) {
+    providers[providerName] = providerClass;
+  };
+
+
   // Properties
   // ------------
 
@@ -288,15 +309,16 @@ Hoodie.Account = (function () {
   // Currently support is Mozilla's "persona". More to follow
   //
   Account.prototype.signInWith = function(providerName) {
-    var provider;
+    var ProviderClass, provider;
 
-    switch(providerName) {
-    case 'persona':
-      provider = new Hoodie.PersonaAccount(this);
-      return provider.signIn();
+    ProviderClass = providers[providerName];
+
+    if (! ProviderClass) {
+      return this.hoodie.rejectWith({error: providerName + " is not yet supported."});
     }
 
-    return this.hoodie.rejectWith({error: providerName + " is not yet supported."});
+    provider = new ProviderClass(this);
+    return provider.signIn();
   };
 
 
@@ -355,7 +377,7 @@ Hoodie.Account = (function () {
   //
   Account.prototype.request = function(type, path, options) {
     options = options || {};
-    return this.hoodie.request.apply(this.hoodie, arguments);
+    return this.hoodie.request.apply(this.hoodie, [type, path, options]);
   };
 
 
