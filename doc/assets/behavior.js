@@ -47,6 +47,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
+                        "title": "Add Provider",
+                        "slug": "add-provider"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
                         "title": "Properties",
                         "slug": "properties"
                       },
@@ -113,6 +121,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                         "level": 2,
                         "title": "sign in with username &amp; password",
                         "slug": "sign-in-with-username-amp-password"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "sign in with \"provider\"",
+                        "slug": "sign-in-with-provider"
                       },
                       "depth": 2
                     }, {
@@ -214,6 +230,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
+                    "title": "Add Provider",
+                    "slug": "add-provider"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
                     "title": "Properties",
                     "slug": "properties"
                   },
@@ -280,6 +304,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "sign in with username &amp; password",
                     "slug": "sign-in-with-username-amp-password"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "sign in with \"provider\"",
+                    "slug": "sign-in-with-provider"
                   },
                   "depth": 2
                 }, {
@@ -2069,6 +2101,35 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
+<<<<<<< HEAD
+=======
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/persona.js",
+                "projectPath": "src/extensions/persona.js",
+                "targetPath": "src/extensions/persona",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "adding Persona as Hoodie.Account Provider ",
+                    "slug": "adding-persona-as-hoodieaccount-provider-",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "adding Persona as Hoodie.Account Provider "
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+>>>>>>> persona cleanup, build & docs
                 "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/share.js",
                 "projectPath": "src/extensions/share.js",
                 "targetPath": "src/extensions/share",
