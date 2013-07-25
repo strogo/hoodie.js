@@ -1,61 +1,43 @@
-<!DOCTYPE html><html lang="en"><head><title>src/extensions/email</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/extensions/email"><meta name="groc-project-path" content="src/extensions/email.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/extensions/email.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodie-email-extension">Hoodie Email Extension</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Sending emails. Not unicorns</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Email</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<!DOCTYPE html><html lang="en"><head><title>src/extensions/email</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/extensions/email"><meta name="groc-project-path" content="src/extensions/email.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/extensions/email.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodie-email-extension">Hoodie Email Extension</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Sending emails. Not unicorns</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
 
-  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">Email</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>TODO
-let's subscribe to general <code>_email</code> changes and provide
-an <code>on</code> interface, so devs can listen to events like:</p>
-
-<ul>
-<li>hoodie.email.on 'sent',  -> ...</li>
-<li>hoodie.email.on 'error', -> ...</li>
-</ul></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_handleEmailUpdate</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_handleEmailUpdate</span><span class="p">;</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="send">send</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sends an email and returns a promise</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Email</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">send</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">emailAttributes</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">attributes</span><span class="p">,</span> <span class="nx">defer</span><span class="p">,</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">emailAttributes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">emailAttributes</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="p">}</span>
-
-    <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
-    <span class="nx">attributes</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">emailAttributes</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">_isValidEmail</span><span class="p">(</span><span class="nx">emailAttributes</span><span class="p">.</span><span class="nx">to</span><span class="p">))</span> <span class="p">{</span>
-      <span class="nx">attributes</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="s2">&quot;Invalid email address (&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">attributes</span><span class="p">.</span><span class="nx">to</span> <span class="o">||</span> <span class="s1">&#39;empty&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">;</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">attributes</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;$email&#39;</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_handleEmailUpdate</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">obj</span><span class="p">);</span>
-    <span class="p">});</span>
+  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>this is the function that gets
+executed on <code>hoodie.email( options )</code></p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">sendEmail</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">sendEmail</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">defer</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if user has no account, sign up anonymously,
+so that tasks get replicated to the Couch.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">hasAccount</span><span class="p">())</span> <span class="p">{</span>
+      <span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">anonymousSignUp</span><span class="p">();</span>
+    <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>we need a custom defer, as the returned promise shall not
+be resolved before the actual email was sent. Technically,
+the confirmation that an email was sent is when the email
+task object has been removed remotely.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">defer</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>add the $email task object to the store. If there is an error,
+reject right away. If not, wait for updates coming from remote.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;$email&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">handleEmailTaskCreated</span><span class="p">(</span><span class="nx">defer</span><span class="p">),</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">Email</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_isValidEmail</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">email</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">email</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-    <span class="p">}</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>this method gets executed, when the $email task was created
+successfully in the local store. We then wait for updates
+coming from remote</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">handleEmailTaskCreated</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">handleEmailTaskCreated</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;change:$email:&quot;</span> <span class="o">+</span> <span class="nx">email</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">handleEmailTaskChange</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span> <span class="p">);</span>
+    <span class="p">};</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>we listen to two events on $email tasks</p>
 
-    <span class="k">return</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/@/</span><span class="p">).</span><span class="nx">test</span><span class="p">(</span><span class="nx">email</span><span class="p">);</span>
+<ol>
+<li>email was sent</li>
+<li>there was an error</li>
+</ol>
+
+<p>When an email was sent, the <code>sentAt</code> property gets set (and the object gets removed).
+When an error occurs, the message gets set in the <code>$error</code> property.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">handleEmailTaskChange</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">handleEmailTaskChange</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">email</span><span class="p">.</span><span class="nx">sentAt</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">email</span><span class="p">);</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">email</span><span class="p">.</span><span class="nx">$error</span><span class="p">)</span>  <span class="p">{</span>
+        <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">email</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
   <span class="p">};</span>
 
-  <span class="nx">Email</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_handleEmailUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">attributes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">attributes</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">attributes</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">attributes</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">attributes</span><span class="p">.</span><span class="nx">deliveredAt</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">attributes</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">one</span><span class="p">(</span><span class="s2">&quot;updated:$email:&quot;</span> <span class="o">+</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">attributes</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_handleEmailUpdate</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">);</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-
-  <span class="p">};</span>
-
-  <span class="k">return</span> <span class="nx">Email</span><span class="p">;</span>
-
-<span class="p">})();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extend Hoodie</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Email</span><span class="p">);</span></div></div></div></div></body></html>
+  <span class="k">return</span> <span class="nx">sendEmail</span><span class="p">;</span>
+<span class="p">});</span></div></div></div></div></body></html>

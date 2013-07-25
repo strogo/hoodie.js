@@ -9,7 +9,7 @@
 <li>findAll(type )</li>
 <li>add(type, object)</li>
 <li>save(type, id, object)</li>
-<li>update(new_properties )</li>
+<li>update(type, id, new_properties )</li>
 <li>updateAll( type, new_properties)</li>
 <li>remove(type, id)</li>
 <li>removeAll(type)</li>
@@ -263,6 +263,8 @@ and restart each 25 seconds.</p></div></div><div class="code"><div class="wrappe
         <span class="nx">new_edits</span><span class="o">:</span> <span class="kc">false</span>
       <span class="p">}</span>
     <span class="p">});</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_pushRequest</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync-changes">sync changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>push objects, then pull updates.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Remote</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">sync</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">objects</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pull</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="events">Events</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Remote</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>

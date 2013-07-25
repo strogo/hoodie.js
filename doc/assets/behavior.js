@@ -2007,65 +2007,12 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "slug": "hoodie-email-extension",
                     "isFileHeader": true
                   },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "send",
-                        "slug": "send"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "PRIVATE",
-                        "slug": "private"
-                      },
-                      "depth": 2
-                    }
-                  ]
+                  "depth": 1
                 },
                 "title": "Hoodie Email Extension"
               },
               "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "send",
-                    "slug": "send"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "PRIVATE",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
+              "outline": []
             }, {
               "type": "file",
               "data": {
@@ -2101,8 +2048,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-<<<<<<< HEAD
-=======
                 "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/persona.js",
                 "projectPath": "src/extensions/persona.js",
                 "targetPath": "src/extensions/persona",
@@ -2129,7 +2074,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
->>>>>>> persona cleanup, build & docs
                 "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/share.js",
                 "projectPath": "src/extensions/share.js",
                 "targetPath": "src/extensions/share",
