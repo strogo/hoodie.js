@@ -48,7 +48,6 @@ module.exports = (function (options) {
   };
 
   if (options) {
-    // name
     storeName = options.name || 'store';
   } else {
     storeName = 'store';
@@ -83,33 +82,29 @@ module.exports = (function (options) {
   // if `validate` returns nothing, the passed object is
   // valid. Otherwise it returns an error
   //
-  //api.validate = options.validate;
+  api.validate = function(object /*, options */) {
 
-  //if (!options.validate) {
-    //api.validate = function(object [>, options <]) {
+    if (!object.id) {
+      return;
+    }
 
-      //if (!object.id) {
-        //return;
-      //}
+    if (!object) {
+      return errors.INVALID_ARGUMENTS('no object passed');
+    }
 
-      //if (!object) {
-        //return errors.INVALID_ARGUMENTS('no object passed');
-      //}
+    if (!isValidType(object.type)) {
+      return errors.INVALID_KEY({
+        type: object.type
+      });
+    }
 
-      //if (!isValidType(object.type)) {
-        //return errors.INVALID_KEY({
-          //type: object.type
-        //});
-      //}
+    if (!isValidId(object.id)) {
+      return errors.INVALID_KEY({
+        id: object.id
+      });
+    }
 
-      //if (!isValidId(object.id)) {
-        //return errors.INVALID_KEY({
-          //id: object.id
-        //});
-      //}
-
-    //};
-  //}
+  };
 
   // Save
   // --------------
@@ -133,10 +128,14 @@ module.exports = (function (options) {
     }
 
     // don't mess with passed object
-    var object = $.extend(true, {}, properties, {type: type, id: id});
+    var object = $.extend(true, {}, properties, {
+      type: type,
+      id: id
+    });
 
     // validations
     var error = api.validate(object, options || {});
+
     if (error) {
       return rejectWith(error);
     }
@@ -153,10 +152,7 @@ module.exports = (function (options) {
   //
   api.add = function (type, properties, options) {
 
-    if (properties === undefined) {
-      properties = {};
-    }
-
+    properties = properties || {};
     options = options || {};
 
     return api.save(type, properties.id, properties, options);
@@ -181,9 +177,7 @@ module.exports = (function (options) {
   //
   api.findOrAdd = function (type, id, properties) {
 
-    if (properties === null) {
-      properties = {};
-    }
+    properties = properties || {};
 
     function handleNotFound() {
       var newProperties = $.extend(true, {
@@ -357,7 +351,7 @@ module.exports = (function (options) {
   // Otherwise remove it from Store.
   //
   api.remove = function (type, id, options) {
-    return decoratePromise( backend.remove(type, id, options || {}) );
+    return decoratePromise(backend.remove(type, id, options || {}));
   };
 
 
@@ -367,7 +361,7 @@ module.exports = (function (options) {
   // Destroye all objects. Can be filtered by a type
   //
   api.removeAll = function (type, options) {
-    return decoratePromise( backend.removeAll(type, options || {}) );
+    return decoratePromise(backend.removeAll(type, options || {}));
   };
 
 
@@ -390,7 +384,7 @@ module.exports = (function (options) {
   required.forEach( function(methodName) {
 
     if (!options.backend[methodName]) {
-      throw new Error('options.backend.'+methodName+' must be passed.');
+      throw new Error('options.backend.' + methodName + ' must be passed.');
     }
 
     backend[methodName] = options.backend[methodName];

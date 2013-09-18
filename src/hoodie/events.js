@@ -18,7 +18,7 @@
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
 var hoodie = require('../hoodie');
 
-module.exports = function hoodieEvents(options) {
+module.exports = function (options) {
   var context = hoodie;
   var namespace = '';
 

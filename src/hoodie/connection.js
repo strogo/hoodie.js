@@ -4,7 +4,9 @@
 // hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
-var hoodie = require('../hoodie');
+var promises = require('./promises');
+var events = require('./events');
+var request = require('./request');
 
 // state
 var online = true;
@@ -30,7 +32,7 @@ var checkConnectionTimeout = null;
 // - triggers `online` event
 // - sets `checkConnectionInterval = 30000`
 //
-var checkConnection = function checkConnection() {
+var checkConnection = function () {
   var req = checkConnectionRequest;
 
   if (req && req.state() === 'pending') {
@@ -39,7 +41,7 @@ var checkConnection = function checkConnection() {
 
   window.clearTimeout(checkConnectionTimeout);
 
-  checkConnectionRequest = hoodie.request('GET', '/').then(
+  checkConnectionRequest = request('GET', '/').then(
     handleCheckConnectionSuccess,
     handleCheckConnectionError
   );
@@ -52,7 +54,7 @@ var checkConnection = function checkConnection() {
 // -------------
 
 //
-var isConnected = function isConnected() {
+var isConnected = function () {
   return online;
 };
 
@@ -63,14 +65,17 @@ var isConnected = function isConnected() {
 function handleCheckConnectionSuccess() {
   checkConnectionInterval = 30000;
 
-  checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+  checkConnectionTimeout = window.setTimeout(
+    exports.checkConnection,
+    checkConnectionInterval
+  );
 
-  if (!hoodie.isConnected()) {
-    hoodie.trigger('reconnected');
+  if (!exports.isConnected()) {
+    events.trigger('reconnected');
     online = true;
   }
 
-  return hoodie.resolve();
+  return promises.resolve();
 }
 
 
@@ -80,14 +85,17 @@ function handleCheckConnectionSuccess() {
 function handleCheckConnectionError() {
   checkConnectionInterval = 3000;
 
-  checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+  checkConnectionTimeout = window.setTimeout(
+    exports.checkConnection,
+    checkConnectionInterval
+  );
 
-  if (hoodie.isConnected()) {
-    hoodie.trigger('disconnected');
+  if (exports.isConnected()) {
+    events.trigger('disconnected');
     online = false;
   }
 
-  return hoodie.reject();
+  return promises.reject();
 }
 
 module.exports = {

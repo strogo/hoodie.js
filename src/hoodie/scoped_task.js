@@ -4,7 +4,6 @@
 // same as store, but with type preset to an initially
 // passed value.
 
-var hoodie = require('../hoodie');
 var events = require('./events');
 
 module.exports = function (taskApi, options) {
@@ -18,7 +17,7 @@ module.exports = function (taskApi, options) {
   if (!id) {
 
     // add events
-    events(hoodie, {
+    events({
       context: api,
       namespace: 'task:' + type
     });
@@ -53,7 +52,7 @@ module.exports = function (taskApi, options) {
   if (id) {
 
     // add events
-    events(hoodie, {
+    events({
       context: api,
       namespace: 'task:' + type + ':' + id
     });
