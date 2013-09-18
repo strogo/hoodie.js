@@ -1,3 +1,5 @@
+/* global open:true */
+
 // Hoodie Core
 // -------------
 //
@@ -17,8 +19,6 @@ var config = require('./hoodie/config');
 var account = require('./hoodie/account');
 var remote = require('./hoodie/remote_store');
 var account = require('./hoodie/account');
-
-console.log(account);
 
 // Constructor
 // -------------
@@ -125,10 +125,10 @@ function Hoodie(baseUrl) {
   //
 
   // set username from config (local store)
-  account.username = config.get('_account.username');
+  this.account.username = config.get('_account.username');
 
   // check for pending password reset
-  account.checkPasswordReset();
+  this.account.checkPasswordReset();
 
   // clear config on sign out
   this.on('account:signout', config.clear);

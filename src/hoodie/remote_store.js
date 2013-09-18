@@ -1,6 +1,3 @@
-/* exported hoodieRemoteStore */
-/* global hoodieStoreApi */
-
 // Remote
 // ========
 
@@ -43,7 +40,8 @@
 var uuid = require('./uuid');
 var connection = require('./connection');
 var promises = require('./promises');
-var remote = require('./request');
+var request = require('./request');
+var remoteStoreApi = require('./store');
 
 module.exports = function (options) {
 
@@ -69,7 +67,7 @@ module.exports = function (options) {
 
     path = '/' + encodeURIComponent(path);
 
-    return remote.request('GET', path).then(parseFromRemote);
+    return request('GET', path).then(parseFromRemote);
   };
 
 
@@ -109,7 +107,7 @@ module.exports = function (options) {
       path = '' + path + '&startkey="' + (encodeURIComponent(startkey)) + '"&endkey="' + (encodeURIComponent(endkey)) + '"';
     }
 
-    return remote.request('GET', path).then(mapDocsFromFindAll).then(parseAllFromRemote);
+    return request('GET', path).then(mapDocsFromFindAll).then(parseAllFromRemote);
   };
 
 
@@ -128,7 +126,7 @@ module.exports = function (options) {
 
     object = parseForRemote(object);
     path = '/' + encodeURIComponent(object._id);
-    return remote.request('PUT', path, {
+    return request('PUT', path, {
       data: object
     });
   };
@@ -158,7 +156,7 @@ module.exports = function (options) {
   };
 
 
-  var remote = hoodieStoreApi({
+  var remote = remoteStoreApi({
 
     name: options.name,
 
@@ -169,11 +167,8 @@ module.exports = function (options) {
       remove: remoteStore.remove,
       removeAll: remoteStore.removeAll
     }
+
   });
-
-
-
-
 
   // properties
   // ------------
@@ -228,7 +223,7 @@ module.exports = function (options) {
   // wrapper for hoodie.request, with some store specific defaults
   // and a prefixed path
   //
-  remote.request = function request(type, path, options) {
+  request = function request(type, path, options) {
     options = options || {};
 
     if (remoteName) {
@@ -246,7 +241,7 @@ module.exports = function (options) {
       options.processData = options.processData || false;
       options.data = JSON.stringify(options.data);
     }
-    return hoodie.request(type, path, options);
+    return request(type, path, options);
   };
 
 
@@ -363,7 +358,7 @@ module.exports = function (options) {
   //
   var pullRequest, pullRequestTimeout;
   remote.pull = function pull() {
-    pullRequest = remote.request('GET', pullUrl());
+    pullRequest = request('GET', pullUrl());
 
     if (remote.isConnected()) {
       window.clearTimeout(pullRequestTimeout);
@@ -401,7 +396,7 @@ module.exports = function (options) {
       object = parseForRemote(object);
       objectsForRemote.push(object);
     }
-    pushRequest = remote.request('POST', '/_bulk_docs', {
+    pushRequest = request('POST', '/_bulk_docs', {
       data: {
         docs: objectsForRemote,
         new_edits: false

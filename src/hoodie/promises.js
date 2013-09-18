@@ -15,45 +15,44 @@
 //     return defer.promise()
 //
 
-var $defer = $.Deferred;
+var dfd = $.Deferred();
 
 // returns true if passed object is a promise (but not a deferred),
 // otherwise false.
 function isPromise(object) {
-  return !! (object &&
-             typeof object.done === 'function' &&
-             typeof object.resolve !== 'function');
+  var hasDone = typeof object.done === 'function';
+  var hasResolved = typeof object.resolve !== 'function';
+
+  return !!(object && hasDone && hasResolved);
 }
 
 //
 function resolve() {
-  return $defer().resolve().promise();
+  return dfd.resolve().promise();
 }
 
 
 //
 function reject() {
-  return $defer().reject().promise();
+  return dfd.reject().promise();
 }
 
 
 //
 function resolveWith() {
-  var _defer = $defer();
-  return _defer.resolve.apply(_defer, arguments).promise();
+  return dfd.resolve.apply(dfd, arguments).promise();
 }
 
 //
 function rejectWith() {
-  var _defer = $defer();
-  return _defer.reject.apply(_defer, arguments).promise();
+  return dfd.reject.apply(dfd, arguments).promise();
 }
 
 //
 // Public API
 //
 module.exports = {
-  defer: $defer,
+  defer: dfd,
   isPromise: isPromise,
   resolve: resolve,
   reject: reject,

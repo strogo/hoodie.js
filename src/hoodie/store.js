@@ -33,8 +33,10 @@ var hoodie = require('../hoodie');
 var events = require('./events');
 var scopedStore = require('./scoped_store');
 var errors = require('./errors');
+var utils = require('util');
 
 module.exports = (function (options) {
+
   var storeName;
 
   // persistance logic
@@ -370,7 +372,7 @@ module.exports = (function (options) {
 
   // extend promises returned by store.api
   api.decoratePromises = function (methods) {
-    return $.extend(promiseApi, methods);
+    return utils.inherits(promiseApi, methods);
   };
 
   // required backend methods
@@ -406,7 +408,7 @@ module.exports = (function (options) {
 
   //
   function decoratePromise(promise) {
-    return $.extend(promise, promiseApi);
+    return utils.inherits(promise, promiseApi);
   }
 
   function resolveWith() {

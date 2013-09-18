@@ -64,10 +64,10 @@ module.exports = function (options) {
   function one(ev, callback) {
     ev = namespace + ev;
     var wrapper = function() {
-      hoodie.unbind(ev, wrapper);
+      exports.unbind(ev, wrapper);
       callback.apply(null, arguments);
     };
-    hoodie.bind(ev, wrapper);
+    exports.bind(ev, wrapper);
   }
 
   // trigger

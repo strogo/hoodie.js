@@ -1,4 +1,4 @@
-/* exported hoodieRemote */
+/* global open:true */
 
 // AccountRemote
 // ===============
@@ -12,10 +12,16 @@
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
 //
+var open = require('./open');
+var account = require('./account');
+var store = require('./store');
+var events = require('./events');
+var config = require('./config');
 
-function hoodieRemote (hoodie) {
+module.exports = function () {
+
   // inherit from Hoodies Store API
-  var remote = hoodie.open(hoodie.account.db(), {
+  var remote = open(account.db(), {
 
     // we're always connected to our own db
     connected: true,
@@ -27,10 +33,10 @@ function hoodieRemote (hoodie) {
     since: sinceNrCallback,
 
     //
-    defaultObjectsToPush: hoodie.store.changedObjects,
+    defaultObjectsToPush: store.changedObjects,
 
     //
-    knownObjects: hoodie.store.index().map( function(key) {
+    knownObjects: store.index().map( function(key) {
       var typeAndId = key.split(/\//);
       return { type: typeAndId[0], id: typeAndId[1]};
     })
@@ -47,7 +53,7 @@ function hoodieRemote (hoodie) {
 
     var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    return hoodie.trigger.apply(hoodie, ['remote:' + eventName].concat(Array.prototype.slice.call(parameters)));
+    return events.trigger.apply(['remote:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -57,7 +63,7 @@ function hoodieRemote (hoodie) {
   // proxies to hoodie.on
   remote.on = function on(eventName, data) {
     eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+'remote:$2');
-    return hoodie.on(eventName, data);
+    return events.on(eventName, data);
   };
 
 
@@ -67,7 +73,7 @@ function hoodieRemote (hoodie) {
   // proxies to hoodie.unbind
   remote.unbind = function unbind(eventName, callback) {
     eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+'remote:$2');
-    return hoodie.unbind(eventName, callback);
+    return events.unbind(eventName, callback);
   };
 
 
@@ -78,10 +84,10 @@ function hoodieRemote (hoodie) {
   //
   function sinceNrCallback(sinceNr) {
     if (sinceNr) {
-      return hoodie.config.set('_remote.since', sinceNr);
+      return config.set('_remote.since', sinceNr);
     }
 
-    return hoodie.config.get('_remote.since') || 0;
+    return config.get('_remote.since') || 0;
   }
 
   //
@@ -89,25 +95,25 @@ function hoodieRemote (hoodie) {
   //
   function subscribeToEvents() {
 
-    hoodie.on('remote:connect', function() {
-      hoodie.on('store:idle', remote.push);
+    events.on('remote:connect', function() {
+      events.on('store:idle', remote.push);
       remote.push();
     });
 
-    hoodie.on('remote:disconnect', function() {
-      hoodie.unbind('store:idle', remote.push);
+    events.on('remote:disconnect', function() {
+      events.unbind('store:idle', remote.push);
     });
 
-    hoodie.on('disconnected', remote.disconnect);
-    hoodie.on('reconnected', remote.connect);
+    events.on('disconnected', remote.disconnect);
+    events.on('reconnected', remote.connect);
 
     // account events
-    hoodie.on('account:signin', function() {
-      remote.connect( hoodie.account.db() );
+    events.on('account:signin', function() {
+      remote.connect(account.db());
     });
 
-    hoodie.on('account:reauthenticated', remote.connect);
-    hoodie.on('account:signout', remote.disconnect);
+    events.on('account:reauthenticated', remote.connect);
+    events.on('account:signout', remote.disconnect);
   }
 
   // allow to run this once from outside
@@ -116,8 +122,6 @@ function hoodieRemote (hoodie) {
     delete remote.subscribeToEvents;
   };
 
-  //
-  // expose remote API
-  //
-  hoodie.remote = remote;
-}
+  return remote;
+
+};

@@ -1,6 +1,3 @@
-/* exported hoodieTask */
-/* global hoodieEvents, hoodieScopedTask */
-
 // Tasks
 // ============
 
@@ -23,17 +20,27 @@
 //     emailTasks.start( properties );
 //     emailTasks.cancel('id123');
 //
-var hoodie = require('../hoodie');
+var events = require('./events');
+var promises = require('./promises');
+var scopedTask = require('./scoped_task');
+var account = require('./account');
+var store = require('./store');
 
-module.exports = function hoodieTask() {
+module.exports = function () {
 
   // public API
   var api = function api(type, id) {
-    return hoodieScopedTask(hoodie, api, {type: type, id: id});
+    return scopedTask(api, {
+      type: type,
+      id: id
+    });
   };
 
   // add events API
-  hoodieEvents(hoodie, { context: api, namespace: 'task' });
+  events({
+    context: api,
+    namespace: 'task'
+  });
 
 
   // start
@@ -44,11 +51,11 @@ module.exports = function hoodieTask() {
   // promise will be rejected.
   //
   api.start = function(type, properties) {
-    if (hoodie.account.hasAccount()) {
-      return hoodie.store.add('$'+type, properties).then(handleNewTask);
+    if (account.hasAccount()) {
+      return store.add('$' + type, properties).then(handleNewTask);
     }
 
-    return hoodie.account.anonymousSignUp().then( function() {
+    return account.anonymousSignUp().then( function() {
       return api.start(type, properties);
     });
   };
@@ -60,7 +67,9 @@ module.exports = function hoodieTask() {
   // cancel a running task
   //
   api.cancel = function(type, id) {
-    return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTask);
+    return store.update('$' + type, id, {
+      cancelledAt: now()
+    }).then(handleCancelledTask);
   };
 
 
@@ -78,6 +87,7 @@ module.exports = function hoodieTask() {
       delete object.cancelledAt;
       return api.start(object.type, object);
     };
+
     return api.cancel(type, id).then(start);
   };
 
@@ -111,7 +121,7 @@ module.exports = function hoodieTask() {
   function subscribeToStoreEvents() {
 
     // account events
-    hoodie.on('store:change', handleStoreChange);
+    events.on('store:change', handleStoreChange);
   }
 
   // allow to run this only once from outside (during Hoodie initialization)
@@ -126,8 +136,8 @@ module.exports = function hoodieTask() {
 
   //
   function handleNewTask(object) {
-    var defer = hoodie.defer();
-    var taskStore = hoodie.store(object.type, object.id);
+    var defer = promises.defer();
+    var taskStore = store(object.type, object.id);
 
     taskStore.on('remove', function(object) {
 
@@ -135,13 +145,14 @@ module.exports = function hoodieTask() {
       object.type = object.type.substr(1);
 
       // task finished by worker.
-      if(object.finishedAt) {
+      if (object.finishedAt) {
         return defer.resolve(object);
       }
 
       // manually removed / cancelled.
       defer.reject(object);
     });
+
     taskStore.on('error', function(error, object) {
 
       // remove "$" from type
@@ -158,15 +169,15 @@ module.exports = function hoodieTask() {
     var defer;
     var type = '$'+task.type;
     var id = task.id;
-    var removePromise = hoodie.store.remove(type, id);
+    var removePromise = store.remove(type, id);
 
     if (!task._rev) {
       // task has not yet been synced.
       return removePromise;
     }
 
-    defer = hoodie.defer();
-    hoodie.one('store:sync:'+type+':'+id, defer.resolve);
+    defer = promises.defer();
+    events.one('store:sync:' + type + ':' + id, defer.resolve);
     removePromise.fail(defer.reject);
 
     return defer.promise();
@@ -193,7 +204,7 @@ module.exports = function hoodieTask() {
     filter = function(object) {
       return object.type.indexOf(startsWith) === 0;
     };
-    return hoodie.store.findAll(filter);
+    return store.findAll(filter);
   }
 
   //
@@ -264,12 +275,11 @@ module.exports = function hoodieTask() {
     }
   }
 
-  //
   function now() {
     return JSON.stringify(new Date()).replace(/['"]/g, '');
   }
 
-  // extend hoodie
   return api;
+
 };
 

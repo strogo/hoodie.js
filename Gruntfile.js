@@ -100,9 +100,18 @@ module.exports = function(grunt) {
         src: [
           'src/hoodie.js'
         ],
-        dest: 'dist/main.js'
+        dest: 'dist/main.js',
+        options: {
+          shim: {
+            jQuery: {
+              path: 'lib/jquery/jquery.js',
+              exports: '$'
+            }
+          }
+        }
       }
     },
+
     wrapup: {
       build: {
         requires: {

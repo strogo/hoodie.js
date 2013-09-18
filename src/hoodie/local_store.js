@@ -1,13 +1,17 @@
-/* exported hoodieStore */
-/* global hoodieStoreApi */
-
 // LocalStore
 // ============
 //
 // window.localStrage wrapper and more
 //
 
-function hoodieStore (hoodie) {
+var uuid = require('./uuid');
+var account = require('./account');
+var promises = require('./promises');
+var events = require('./events');
+var errors = require('./errors');
+var storeApi = require('./store');
+
+module.exports = function () {
 
   var localStore = {};
 
@@ -67,14 +71,13 @@ function hoodieStore (hoodie) {
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      object.id = hoodie.uuid();
+      object.id = uuid();
     }
 
     if (isNew) {
       // add createdBy hash
-      object.createdBy = object.createdBy || hoodie.account.ownerHash;
-    }
-    else {
+      object.createdBy = object.createdBy || account.ownerHash;
+    } else {
       // leave createdBy hash
       if (currentObject.createdBy) {
         object.createdBy = currentObject.createdBy;
@@ -125,7 +128,7 @@ function hoodieStore (hoodie) {
       delete object._$local;
     }
 
-    defer = hoodie.defer();
+    defer = promises.defer();
 
     try {
       object = cache(object.type, object.id, object, options);
@@ -152,7 +155,7 @@ function hoodieStore (hoodie) {
   localStore.find = function(type, id) {
     var defer, error, object;
 
-    defer = hoodie.defer();
+    defer = promises.defer();
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
@@ -163,7 +166,7 @@ function hoodieStore (hoodie) {
     try {
       object = cache(type, id);
       if (!object) {
-        defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
+        defer.reject(errors.NOT_FOUND(type, id)).promise();
       }
       defer.resolve(object);
     } catch (_error) {
@@ -214,7 +217,7 @@ function hoodieStore (hoodie) {
       };
     }
 
-    defer = hoodie.defer();
+    defer = promises.defer();
 
     try {
 
@@ -289,12 +292,12 @@ function hoodieStore (hoodie) {
       cachedObject[key] = false;
       clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
-        return hoodie.resolveWith(object);
+        return promises.resolveWith(object);
       }
     }
 
     if (!object) {
-      return hoodie.rejectWith(Hoodie.Errors.NOT_FOUND(type, id));
+      return promises.rejectWith(errors.NOT_FOUND(type, id));
     }
 
     if (object._syncedAt) {
@@ -308,7 +311,7 @@ function hoodieStore (hoodie) {
     }
 
     triggerEvents('remove', object, options);
-    return hoodie.resolveWith(object);
+    return promises.resolveWith(object);
   };
 
 
@@ -341,19 +344,19 @@ function hoodieStore (hoodie) {
   function validate (object) {
 
     if (!isValidType(object.type)) {
-      return Hoodie.Errors.INVALID_KEY({
+      return errors.INVALID_KEY({
         type: object.type
       });
     }
 
     if (arguments.length > 0 && !isValidId(object.id)) {
-      return Hoodie.Errors.INVALID_KEY({
+      return errors.INVALID_KEY({
         id: object.id
       });
     }
   }
 
-  var store = hoodieStoreApi(hoodie, {
+  var store = storeApi({
 
     // validate
     validate: validate,
@@ -444,7 +447,8 @@ function hoodieStore (hoodie) {
   //       using `hoodie.store` before.
   store.clear = function clear() {
     var defer, key, keys, results;
-    defer = hoodie.defer();
+    defer = promises.defer();
+
     try {
       keys = store.index();
       results = (function() {
@@ -660,14 +664,14 @@ function hoodieStore (hoodie) {
   function subscribeToOutsideEvents() {
 
     // account events
-    hoodie.on('account:cleanup', store.clear);
-    hoodie.on('account:signup', markAllAsChanged);
-    hoodie.on('remote:bootstrap:start', startBootstrappingMode);
-    hoodie.on('remote:bootstrap:end', endBootstrappingMode);
+    events.on('account:cleanup', store.clear);
+    events.on('account:signup', markAllAsChanged);
+    events.on('remote:bootstrap:start', startBootstrappingMode);
+    events.on('remote:bootstrap:end', endBootstrappingMode);
 
     // remote events
-    hoodie.on('remote:change', handleRemoteChange);
-    hoodie.on('remote:push', handlePushedObject);
+    events.on('remote:change', handleRemoteChange);
+    events.on('remote:push', handlePushedObject);
   }
 
   // allow to run this once from outside
@@ -903,7 +907,7 @@ function hoodieStore (hoodie) {
 
   //
   function enqueue(method, args) {
-    var defer = hoodie.defer();
+    var defer = promises.defer();
     queue.push([method, args, defer]);
     return defer.promise();
   }
@@ -938,7 +942,7 @@ function hoodieStore (hoodie) {
   // expose public API
   //
   // inherit from Hoodies Store API
-  hoodie.store = store;
+  store = storeApi;
 
   // allow to run this once from outside
   store.bootstrapDirtyObjects = function() {
@@ -951,4 +955,5 @@ function hoodieStore (hoodie) {
     patchIfNotPersistant();
     delete store.patchIfNotPersistant;
   };
-}
+
+};

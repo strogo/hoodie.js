@@ -1,12 +1,12 @@
-/* exported hoodieOpen */
-/* global hoodieRemoteStore */
+/* global $:true */
 
 // Open stores
 // -------------
-var hoodie = require('../hoodie');
+var $ = require('jQuery');
+var remoteStoreApi = require('./store');
 
 module.exports = function hoodieOpen() {
-  var $extend = window.jQuery.extend;
+  var $extend = $.extend;
 
   // generic method to open a store. Used by
   //
@@ -24,7 +24,7 @@ module.exports = function hoodieOpen() {
       name: storeName
     });
 
-    return hoodieRemoteStore(hoodie, options);
+    return remoteStoreApi(options);
   }
 
   //
