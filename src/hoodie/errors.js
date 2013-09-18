@@ -2,7 +2,7 @@
 // one place to rule them all!
 //
 
-Hoodie.Errors = {
+module.exports = {
 
   // INVALID_KEY
   // --------------

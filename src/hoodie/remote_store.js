@@ -40,7 +40,12 @@
 //
 
 //
-function hoodieRemoteStore (hoodie, options) {
+var uuid = require('./uuid');
+var connection = require('./connection');
+var promises = require('./promises');
+var remote = require('./request');
+
+module.exports = function (options) {
 
   var remoteStore = {};
 
@@ -118,7 +123,7 @@ function hoodieRemoteStore (hoodie, options) {
     var path;
 
     if (!object.id) {
-      object.id = hoodie.uuid();
+      object.id = uuid();
     }
 
     object = parseForRemote(object);
@@ -153,7 +158,7 @@ function hoodieRemoteStore (hoodie, options) {
   };
 
 
-  var remote = hoodieStoreApi(hoodie, {
+  var remote = hoodieStoreApi({
 
     name: options.name,
 
@@ -383,7 +388,7 @@ function hoodieRemoteStore (hoodie, options) {
     }
 
     if (objects.length === 0) {
-      return hoodie.resolveWith([]);
+      return promises.resolveWith([]);
     }
 
     objectsForRemote = [];
@@ -587,7 +592,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   //
   function generateNewRevisionId() {
-    return hoodie.uuid(9);
+    return uuid(9);
   }
 
 
@@ -680,7 +685,7 @@ function hoodieRemoteStore (hoodie, options) {
       //
       remote.trigger('error:server', error);
       window.setTimeout(remote.pull, 3000);
-      return hoodie.checkConnection();
+      return connection.checkConnection();
     default:
       // usually a 0, which stands for timeout or server not reachable.
       if (xhr.statusText === 'abort') {
@@ -694,7 +699,7 @@ function hoodieRemoteStore (hoodie, options) {
         // we'll try again after a 3s timeout
         //
         window.setTimeout(remote.pull, 3000);
-        return hoodie.checkConnection();
+        return connection.checkConnection();
       }
     }
   }
@@ -760,4 +765,4 @@ function hoodieRemoteStore (hoodie, options) {
 
   // expose public API
   return remote;
-}
+};

@@ -3,8 +3,9 @@
 
 // Open stores
 // -------------
+var hoodie = require('../hoodie');
 
-function hoodieOpen(hoodie) {
+module.exports = function hoodieOpen() {
   var $extend = window.jQuery.extend;
 
   // generic method to open a store. Used by
@@ -29,5 +30,6 @@ function hoodieOpen(hoodie) {
   //
   // Public API
   //
-  hoodie.open = open;
-}
+  return open;
+};
+

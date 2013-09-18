@@ -2,8 +2,9 @@
 
 // hoodie.dispose
 // ================
+var hoodie = require('../hoodie');
 
-function hoodieDispose (hoodie) {
+module.exports = function hoodieDispose () {
 
   // if a hoodie instance is not needed anymore, it can
   // be disposed using this method. A `dispose` event
@@ -16,6 +17,5 @@ function hoodieDispose (hoodie) {
   //
   // Public API
   //
-  hoodie.dispose = dispose;
-}
-
+  return dispose;
+};

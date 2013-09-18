@@ -23,8 +23,9 @@
 //     emailTasks.start( properties );
 //     emailTasks.cancel('id123');
 //
+var hoodie = require('../hoodie');
 
-function hoodieTask(hoodie) {
+module.exports = function hoodieTask() {
 
   // public API
   var api = function api(type, id) {
@@ -269,5 +270,6 @@ function hoodieTask(hoodie) {
   }
 
   // extend hoodie
-  hoodie.task = api;
-}
+  return api;
+};
+

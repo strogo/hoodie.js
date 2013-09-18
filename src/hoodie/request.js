@@ -5,7 +5,10 @@
 // ================
 
 //
-function hoodieRequest(hoodie) {
+var promises = require('./promises');
+
+module.exports = function () {
+
   var $extend = $.extend;
   var $ajax = $.ajax;
 
@@ -34,7 +37,7 @@ function hoodieRequest(hoodie) {
 
     // if relative path passed, prefix with baseUrl
     if (!/^http/.test(url)) {
-      url = (hoodie.baseUrl || '') + API_PATH + url;
+      url = (this.baseUrl || '') + API_PATH + url;
     }
 
     // if url is cross domain, set CORS headers
@@ -71,16 +74,16 @@ function hoodieRequest(hoodie) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + (hoodie.baseUrl || '/'))
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + (this.baseUrl || '/'))
       };
     }
 
-    return hoodie.rejectWith(error).promise();
+    return promises.rejectWith(error).promise();
   }
 
 
   //
   // public API
   //
-  hoodie.request = request;
-}
+  return request;
+};

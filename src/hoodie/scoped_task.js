@@ -1,14 +1,13 @@
-/* exported hoodieScopedTask */
-/* global hoodieEvents */
-
 // scoped Store
 // ============
 
 // same as store, but with type preset to an initially
 // passed value.
-//
 
-function hoodieScopedTask(hoodie, taskApi, options) {
+var hoodie = require('../hoodie');
+var events = require('./events');
+
+module.exports = function (taskApi, options) {
 
   var type = options.type;
   var id = options.id;
@@ -19,7 +18,7 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   if (!id) {
 
     // add events
-    hoodieEvents(hoodie, {
+    events(hoodie, {
       context: api,
       namespace: 'task:' + type
     });
@@ -54,7 +53,7 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   if (id) {
 
     // add events
-    hoodieEvents(hoodie, {
+    events(hoodie, {
       context: api,
       namespace: 'task:' + type + ':' + id
     });
@@ -71,4 +70,4 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   }
 
   return api;
-}
+};

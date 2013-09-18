@@ -28,7 +28,7 @@ module.exports = function(grunt) {
     watch: {
       //files: ['<%= jshint.files %>'],
       files: ['Gruntfile.js', 'src/**/*.js'],
-      tasks: ['jshint', 'shell:test']
+      tasks: ['browserify']
     },
 
     concat: {
@@ -93,10 +93,33 @@ module.exports = function(grunt) {
           stderr: true
         }
       }
+    },
+
+    browserify: {
+      build: {
+        src: [
+          'src/hoodie.js'
+        ],
+        dest: 'public/main.js'
+      }
+    },
+    wrapup: {
+      build: {
+        requires: {
+          'public/main.js': true
+        },
+        options: {
+          compress: false,
+          output: 'dist/built.js',
+          globalize: 'Hoodie'
+        }
+      }
     }
 
   });
 
+  grunt.loadNpmTasks('grunt-wrapup');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');

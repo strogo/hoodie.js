@@ -1,6 +1,3 @@
-/* global hoodieScopedStoreApi, hoodieEvents */
-/* exported hoodieStoreApi */
-
 // Store
 // ============
 
@@ -32,8 +29,13 @@
 //     taskStore.findAll().then( showAllTasks );
 //     taskStore.update('id123', {done: true});
 //
+var hoodie = require('../hoodie');
+var events = require('./events');
+var scopedStore = require('./scoped_store');
+var errors = require('./errors');
 
-function hoodieStoreApi(hoodie, options) {
+module.exports = (function (options) {
+  var storeName;
 
   // persistance logic
   var backend = {};
@@ -45,17 +47,30 @@ function hoodieStoreApi(hoodie, options) {
     hoodie: hoodie
   };
 
-  // name
-  var storeName = options.name || 'store';
+  if (options) {
+    // name
+    storeName = options.name || 'store';
+  } else {
+    storeName = 'store';
+  }
+
 
   // public API
   var api = function api(type, id) {
-    var scopedOptions = $.extend(true, {type: type, id: id}, options);
-    return hoodieScopedStoreApi(hoodie, api, scopedOptions);
+
+    var scopedOptions = $.extend(true, {
+      type: type,
+      id: id
+    }, options);
+
+    return scopedStore(api, scopedOptions);
   };
 
   // add event API
-  hoodieEvents(hoodie, { context: api, namespace: storeName });
+  events({
+    context: api,
+    namespace: storeName
+  });
 
 
   // Validate
@@ -68,31 +83,33 @@ function hoodieStoreApi(hoodie, options) {
   // if `validate` returns nothing, the passed object is
   // valid. Otherwise it returns an error
   //
-  api.validate = options.validate;
+  //api.validate = options.validate;
 
-  if (!options.validate) {
-    api.validate = function(object /*, options */) {
+  //if (!options.validate) {
+    //api.validate = function(object [>, options <]) {
 
-      if (!object) {
-        return Hoodie.Errors.INVALID_ARGUMENTS('no object passed');
-      }
-      if (!isValidType(object.type)) {
-        return Hoodie.Errors.INVALID_KEY({
-          type: object.type
-        });
-      }
+      //if (!object.id) {
+        //return;
+      //}
 
-      if (!object.id) {
-        return;
-      }
+      //if (!object) {
+        //return errors.INVALID_ARGUMENTS('no object passed');
+      //}
 
-      if (!isValidId(object.id)) {
-        return Hoodie.Errors.INVALID_KEY({
-          id: object.id
-        });
-      }
-    };
-  }
+      //if (!isValidType(object.type)) {
+        //return errors.INVALID_KEY({
+          //type: object.type
+        //});
+      //}
+
+      //if (!isValidId(object.id)) {
+        //return errors.INVALID_KEY({
+          //id: object.id
+        //});
+      //}
+
+    //};
+  //}
 
   // Save
   // --------------
@@ -107,9 +124,9 @@ function hoodieStoreApi(hoodie, options) {
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
   //
-  api.save = function save(type, id, properties, options) {
+  api.save = function (type, id, properties, options) {
 
-    if ( options ) {
+    if (options) {
       options = $.extend(true, {}, options);
     } else {
       options = {};
@@ -120,9 +137,11 @@ function hoodieStoreApi(hoodie, options) {
 
     // validations
     var error = api.validate(object, options || {});
-    if(error) { return rejectWith(error); }
+    if (error) {
+      return rejectWith(error);
+    }
 
-    return decoratePromise( backend.save(object, options || {}) );
+    return decoratePromise(backend.save(object, options || {}));
   };
 
 
@@ -132,13 +151,14 @@ function hoodieStoreApi(hoodie, options) {
   // `.add` is an alias for `.save`, with the difference that there is no id argument.
   // Internally it simply calls `.save(type, undefined, object).
   //
-  api.add = function add(type, properties, options) {
+  api.add = function (type, properties, options) {
 
     if (properties === undefined) {
       properties = {};
     }
 
     options = options || {};
+
     return api.save(type, properties.id, properties, options);
   };
 
@@ -147,9 +167,8 @@ function hoodieStoreApi(hoodie, options) {
   // ------
 
   //
-  api.find = function find(type, id) {
-
-    return decoratePromise( backend.find(type, id) );
+  api.find = function (type, id) {
+    return decoratePromise(backend.find(type, id));
   };
 
 
@@ -160,24 +179,25 @@ function hoodieStoreApi(hoodie, options) {
   // 2. If share could be found, return it
   // 3. If not, add one and return it.
   //
-  api.findOrAdd = function findOrAdd(type, id, properties) {
+  api.findOrAdd = function (type, id, properties) {
 
     if (properties === null) {
       properties = {};
     }
 
     function handleNotFound() {
-      var newProperties;
-      newProperties = $.extend(true, {
+      var newProperties = $.extend(true, {
         id: id
       }, properties);
+
       return api.add(type, newProperties);
     }
 
     // promise decorations get lost when piped through `then`,
     // that's why we need to decorate the find's promise again.
     var promise = api.find(type, id).then(null, handleNotFound);
-    return decoratePromise( promise );
+
+    return decoratePromise(promise);
   };
 
 
@@ -187,9 +207,8 @@ function hoodieStoreApi(hoodie, options) {
   // returns all objects from store.
   // Can be optionally filtered by a type or a function
   //
-  api.findAll = function findAll(type, options) {
-
-    return decoratePromise( backend.findAll(type, options) );
+  api.findAll = function (type, options) {
+    return decoratePromise(backend.findAll(type, options));
   };
 
 
@@ -207,7 +226,7 @@ function hoodieStoreApi(hoodie, options) {
   // hoodie.store.update('car', 'abc4567', {sold: true})
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   //
-  api.update = function update(type, id, objectUpdate, options) {
+  api.update = function (type, id, objectUpdate, options) {
 
     function handleFound(currentObject) {
       var changedProperties, newObj, value;
@@ -262,7 +281,7 @@ function hoodieStoreApi(hoodie, options) {
   // same as `.update()`, but in case the object cannot be found,
   // it gets created
   //
-  api.updateOrAdd = function updateOrAdd(type, id, objectUpdate, options) {
+  api.updateOrAdd = function (type, id, objectUpdate, options) {
     function handleNotFound() {
       var properties = $.extend(true, {}, objectUpdate, {id: id});
       return api.add(type, properties, options);
@@ -283,7 +302,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   // hoodie.store.updateAll()
   //
-  api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
+  api.updateAll = function (filterOrObjects, objectUpdate, options) {
     var promise;
 
     options = options || {};
@@ -337,7 +356,7 @@ function hoodieStoreApi(hoodie, options) {
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
   //
-  api.remove = function remove(type, id, options) {
+  api.remove = function (type, id, options) {
     return decoratePromise( backend.remove(type, id, options || {}) );
   };
 
@@ -347,7 +366,7 @@ function hoodieStoreApi(hoodie, options) {
 
   // Destroye all objects. Can be filtered by a type
   //
-  api.removeAll = function removeAll(type, options) {
+  api.removeAll = function (type, options) {
     return decoratePromise( backend.removeAll(type, options || {}) );
   };
 
@@ -356,11 +375,9 @@ function hoodieStoreApi(hoodie, options) {
   // -------------------
 
   // extend promises returned by store.api
-  api.decoratePromises = function decoratePromises(methods) {
+  api.decoratePromises = function (methods) {
     return $.extend(promiseApi, methods);
   };
-
-
 
   // required backend methods
   // -------------------------
@@ -409,4 +426,6 @@ function hoodieStoreApi(hoodie, options) {
   }
 
   return api;
-}
+
+}());
+

@@ -3,8 +3,22 @@
 //
 // the door to world domination (apps)
 //
+//
+var events = require('./hoodie/events');
+var promises = require('./hoodie/promises');
+var request = require('./hoodie/request');
+var connection = require('./hoodie/connection');
+var UUID = require('./hoodie/uuid');
+var dispose = require('./hoodie/dispose');
+var open = require('./hoodie/open');
+var store = require('./hoodie/store');
+var task = require('./hoodie/task');
+var config = require('./hoodie/config');
+var account = require('./hoodie/account');
+var remote = require('./hoodie/remote_store');
+var account = require('./hoodie/account');
 
-
+console.log(account);
 
 // Constructor
 // -------------
@@ -19,6 +33,8 @@
 function Hoodie(baseUrl) {
   var hoodie = this;
 
+
+
   // enforce initialization with `new`
   if (!(hoodie instanceof Hoodie)) {
     throw new Error('usage: new Hoodie(url);');
@@ -26,7 +42,7 @@ function Hoodie(baseUrl) {
 
   if (baseUrl) {
     // remove trailing slashes
-    hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
+    this.baseUrl = baseUrl.replace(/\/+$/, '');
   }
 
 
@@ -37,7 +53,7 @@ function Hoodie(baseUrl) {
   //
   //     hoodie.extend(function(hoodie) {} )
   //
-  hoodie.extend = function extend(extension) {
+  this.extend = function extend(extension) {
     extension(hoodie);
   };
 
@@ -46,19 +62,18 @@ function Hoodie(baseUrl) {
   // Extending hoodie core
   //
 
-  /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
-            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID,
-            hoodieDispose, hoodieOpen, hoodieTask
-  */
-
   // * hoodie.bind
   // * hoodie.on
   // * hoodie.one
   // * hoodie.trigger
   // * hoodie.unbind
   // * hoodie.off
-  /*global hoodieEvents */
-  hoodie.extend( hoodieEvents );
+  this.bind = events.bind;
+  this.on = events.on;
+  this.one = events.one;
+  this.trigger = events.trigger;
+  this.unbind = events.unbind;
+  this.off = events.off;
 
 
   // * hoodie.defer
@@ -67,38 +82,44 @@ function Hoodie(baseUrl) {
   // * hoodie.reject
   // * hoodie.resolveWith
   // * hoodie.rejectWith
-  hoodie.extend( hoodiePromises );
+  this.defer = promises.defer;
+  this.isPromise = promises.isPromise;
+  this.resolve = promises.resolve;
+  this.reject = promises.reject;
+  this.resolveWith = promises.resolveWith;
+
 
   // * hoodie.request
-  hoodie.extend( hoodieRequest );
+  this.request = request.request;
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
-  hoodie.extend( hoodieConnection );
+  this.isOnline = connection.isOnline;
+  this.checkConnection = connection.checkConnection;
 
   // * hoodie.uuid
-  hoodie.extend( hoodieUUID );
+  this.UUID = UUID.uuid;
 
   // * hoodie.dispose
-  hoodie.extend( hoodieDispose );
+  this.dispose = dispose.dispose;
 
   // * hoodie.open
-  hoodie.extend( hoodieOpen );
+  this.open = open.open;
 
   // * hoodie.store
-  hoodie.extend( hoodieStore );
+  this.store = store.store;
 
   // * hoodie.task
-  hoodie.extend( hoodieTask );
+  this.task = task.task;
 
   // * hoodie.config
-  hoodie.extend( hoodieConfig );
+  this.config = config.config;
 
   // * hoodie.account
-  hoodie.extend( hoodieAccount );
+  this.account = account.account;
 
   // * hoodie.remote
-  hoodie.extend( hoodieRemote );
+  this.remote = remote.remote;
 
 
   //
@@ -106,30 +127,30 @@ function Hoodie(baseUrl) {
   //
 
   // set username from config (local store)
-  hoodie.account.username = hoodie.config.get('_account.username');
+  account.username = config.get('_account.username');
 
   // check for pending password reset
-  hoodie.account.checkPasswordReset();
+  account.checkPasswordReset();
 
   // clear config on sign out
-  hoodie.on('account:signout', hoodie.config.clear);
+  this.on('account:signout', hoodie.config.clear);
 
   // hoodie.store
-  hoodie.store.patchIfNotPersistant();
-  hoodie.store.subscribeToOutsideEvents();
-  hoodie.store.bootstrapDirtyObjects();
+  this.store.patchIfNotPersistant();
+  this.store.subscribeToOutsideEvents();
+  this.store.bootstrapDirtyObjects();
 
   // hoodie.remote
-  hoodie.remote.subscribeToEvents();
+  this.remote.subscribeToEvents();
 
   // hoodie.task
-  hoodie.task.subscribeToStoreEvents();
+  this.task.subscribeToStoreEvents();
 
   // authenticate
   // we use a closure to not pass the username to connect, as it
   // would set the name of the remote store, which is not the username.
-  hoodie.account.authenticate().then( function( /* username */ ) {
-    hoodie.remote.connect();
+  this.account.authenticate().then(function( /* username */ ) {
+    remote.connect();
   });
 
   // check connection when browser goes online / offline
@@ -137,7 +158,7 @@ function Hoodie(baseUrl) {
   window.addEventListener('offline', hoodie.checkConnection, false);
 
   // start checking connection
-  hoodie.checkConnection();
+  this.checkConnection();
 
   //
   // loading user extensions
@@ -159,7 +180,7 @@ function Hoodie(baseUrl) {
 //
 // Hoodie can also be extended anonymously
 //
-//      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+//     Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
 //
 var extensions = [];
 
@@ -176,32 +197,6 @@ function applyExtensions(hoodie) {
   }
 }
 
-//
-// expose Hoodie to module loaders. Based on jQuery's implementation.
-//
-if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
+module.exports = Hoodie;
 
-  // Expose Hoodie as module.exports in loaders that implement the Node
-  // module pattern (including browserify). Do not create the global, since
-  // the user will be storing it themselves locally, and globals are frowned
-  // upon in the Node module world.
-  module.exports = Hoodie;
-
-
-} else if ( typeof define === 'function' && define.amd ) {
-
-  // Register as a named AMD module, since Hoodie can be concatenated with other
-  // files that may use define, but not via a proper concatenation script that
-  // understands anonymous AMD modules. A named AMD is safest and most robust
-  // way to register. Lowercase hoodie is used because AMD module names are
-  // derived from file names, and Hoodie is normally delivered in a lowercase
-  // file name.
-  define(function () {
-    return Hoodie;
-  });
-
-} else {
-
-  // set global
-  global.Hoodie = Hoodie;
-}
+window.Hoodie = Hoodie;
