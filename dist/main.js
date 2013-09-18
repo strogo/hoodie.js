@@ -34,8 +34,6 @@ console.log(account);
 function Hoodie(baseUrl) {
   var hoodie = this;
 
-
-
   // enforce initialization with `new`
   if (!(hoodie instanceof Hoodie)) {
     throw new Error('usage: new Hoodie(url);');
@@ -91,7 +89,7 @@ function Hoodie(baseUrl) {
 
 
   // * hoodie.request
-  this.request = request.request;
+  this.request = request;
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
@@ -99,28 +97,28 @@ function Hoodie(baseUrl) {
   this.checkConnection = connection.checkConnection;
 
   // * hoodie.uuid
-  this.UUID = UUID.uuid;
+  this.UUID = UUID;
 
   // * hoodie.dispose
-  this.dispose = dispose.dispose;
+  this.dispose = dispose;
 
   // * hoodie.open
-  this.open = open.open;
+  this.open = open;
 
   // * hoodie.store
-  this.store = store.store;
+  this.store = store;
 
   // * hoodie.task
-  this.task = task.task;
+  this.task = task;
 
   // * hoodie.config
-  this.config = config.config;
+  this.config = config;
 
   // * hoodie.account
-  this.account = account.account;
+  this.account = account;
 
   // * hoodie.remote
-  this.remote = remote.remote;
+  this.remote = remote;
 
 
   //
@@ -134,7 +132,7 @@ function Hoodie(baseUrl) {
   account.checkPasswordReset();
 
   // clear config on sign out
-  this.on('account:signout', hoodie.config.clear);
+  this.on('account:signout', config.clear);
 
   // hoodie.store
   this.store.patchIfNotPersistant();
@@ -155,8 +153,8 @@ function Hoodie(baseUrl) {
   });
 
   // check connection when browser goes online / offline
-  window.addEventListener('online', hoodie.checkConnection, false);
-  window.addEventListener('offline', hoodie.checkConnection, false);
+  window.addEventListener('online', this.checkConnection, false);
+  window.addEventListener('offline', this.checkConnection, false);
 
   // start checking connection
   this.checkConnection();
@@ -199,7 +197,6 @@ function applyExtensions(hoodie) {
 }
 
 module.exports = Hoodie;
-
 window.Hoodie = Hoodie;
 
 },{"./hoodie/account":2,"./hoodie/config":3,"./hoodie/connection":4,"./hoodie/dispose":5,"./hoodie/events":7,"./hoodie/open":8,"./hoodie/promises":9,"./hoodie/remote_store":10,"./hoodie/request":11,"./hoodie/store":13,"./hoodie/task":14,"./hoodie/uuid":15}],2:[function(require,module,exports){
@@ -1317,7 +1314,9 @@ module.exports = config;
 // hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
-var hoodie = require('../hoodie');
+var promises = require('./promises');
+var events = require('./events');
+var request = require('./request');
 
 // state
 var online = true;
@@ -1343,7 +1342,7 @@ var checkConnectionTimeout = null;
 // - triggers `online` event
 // - sets `checkConnectionInterval = 30000`
 //
-var checkConnection = function checkConnection() {
+var checkConnection = function () {
   var req = checkConnectionRequest;
 
   if (req && req.state() === 'pending') {
@@ -1352,7 +1351,7 @@ var checkConnection = function checkConnection() {
 
   window.clearTimeout(checkConnectionTimeout);
 
-  checkConnectionRequest = hoodie.request('GET', '/').then(
+  checkConnectionRequest = request('GET', '/').then(
     handleCheckConnectionSuccess,
     handleCheckConnectionError
   );
@@ -1365,7 +1364,7 @@ var checkConnection = function checkConnection() {
 // -------------
 
 //
-var isConnected = function isConnected() {
+var isConnected = function () {
   return online;
 };
 
@@ -1376,14 +1375,17 @@ var isConnected = function isConnected() {
 function handleCheckConnectionSuccess() {
   checkConnectionInterval = 30000;
 
-  checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+  checkConnectionTimeout = window.setTimeout(
+    exports.checkConnection,
+    checkConnectionInterval
+  );
 
-  if (!hoodie.isConnected()) {
-    hoodie.trigger('reconnected');
+  if (!exports.isConnected()) {
+    events.trigger('reconnected');
     online = true;
   }
 
-  return hoodie.resolve();
+  return promises.resolve();
 }
 
 
@@ -1393,14 +1395,17 @@ function handleCheckConnectionSuccess() {
 function handleCheckConnectionError() {
   checkConnectionInterval = 3000;
 
-  checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+  checkConnectionTimeout = window.setTimeout(
+    exports.checkConnection,
+    checkConnectionInterval
+  );
 
-  if (hoodie.isConnected()) {
-    hoodie.trigger('disconnected');
+  if (exports.isConnected()) {
+    events.trigger('disconnected');
     online = false;
   }
 
-  return hoodie.reject();
+  return promises.reject();
 }
 
 module.exports = {
@@ -1409,7 +1414,7 @@ module.exports = {
 };
 
 
-},{"../hoodie":1}],5:[function(require,module,exports){
+},{"./events":7,"./promises":9,"./request":11}],5:[function(require,module,exports){
 /* exported hoodieDispose */
 
 // hoodie.dispose
@@ -1489,7 +1494,7 @@ module.exports = {
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
 var hoodie = require('../hoodie');
 
-module.exports = function hoodieEvents(options) {
+module.exports = function (options) {
   var context = hoodie;
   var namespace = '';
 
@@ -2765,7 +2770,6 @@ module.exports = (function (options) {
   };
 
   if (options) {
-    // name
     storeName = options.name || 'store';
   } else {
     storeName = 'store';
@@ -2800,33 +2804,29 @@ module.exports = (function (options) {
   // if `validate` returns nothing, the passed object is
   // valid. Otherwise it returns an error
   //
-  //api.validate = options.validate;
+  api.validate = function(object /*, options */) {
 
-  //if (!options.validate) {
-    //api.validate = function(object [>, options <]) {
+    if (!object.id) {
+      return;
+    }
 
-      //if (!object.id) {
-        //return;
-      //}
+    if (!object) {
+      return errors.INVALID_ARGUMENTS('no object passed');
+    }
 
-      //if (!object) {
-        //return errors.INVALID_ARGUMENTS('no object passed');
-      //}
+    if (!isValidType(object.type)) {
+      return errors.INVALID_KEY({
+        type: object.type
+      });
+    }
 
-      //if (!isValidType(object.type)) {
-        //return errors.INVALID_KEY({
-          //type: object.type
-        //});
-      //}
+    if (!isValidId(object.id)) {
+      return errors.INVALID_KEY({
+        id: object.id
+      });
+    }
 
-      //if (!isValidId(object.id)) {
-        //return errors.INVALID_KEY({
-          //id: object.id
-        //});
-      //}
-
-    //};
-  //}
+  };
 
   // Save
   // --------------
@@ -2850,10 +2850,14 @@ module.exports = (function (options) {
     }
 
     // don't mess with passed object
-    var object = $.extend(true, {}, properties, {type: type, id: id});
+    var object = $.extend(true, {}, properties, {
+      type: type,
+      id: id
+    });
 
     // validations
     var error = api.validate(object, options || {});
+
     if (error) {
       return rejectWith(error);
     }
@@ -2870,10 +2874,7 @@ module.exports = (function (options) {
   //
   api.add = function (type, properties, options) {
 
-    if (properties === undefined) {
-      properties = {};
-    }
-
+    properties = properties || {};
     options = options || {};
 
     return api.save(type, properties.id, properties, options);
@@ -2898,9 +2899,7 @@ module.exports = (function (options) {
   //
   api.findOrAdd = function (type, id, properties) {
 
-    if (properties === null) {
-      properties = {};
-    }
+    properties = properties || {};
 
     function handleNotFound() {
       var newProperties = $.extend(true, {
@@ -3074,7 +3073,7 @@ module.exports = (function (options) {
   // Otherwise remove it from Store.
   //
   api.remove = function (type, id, options) {
-    return decoratePromise( backend.remove(type, id, options || {}) );
+    return decoratePromise(backend.remove(type, id, options || {}));
   };
 
 
@@ -3084,7 +3083,7 @@ module.exports = (function (options) {
   // Destroye all objects. Can be filtered by a type
   //
   api.removeAll = function (type, options) {
-    return decoratePromise( backend.removeAll(type, options || {}) );
+    return decoratePromise(backend.removeAll(type, options || {}));
   };
 
 
@@ -3107,7 +3106,7 @@ module.exports = (function (options) {
   required.forEach( function(methodName) {
 
     if (!options.backend[methodName]) {
-      throw new Error('options.backend.'+methodName+' must be passed.');
+      throw new Error('options.backend.' + methodName + ' must be passed.');
     }
 
     backend[methodName] = options.backend[methodName];

@@ -100,7 +100,7 @@ module.exports = function(grunt) {
         src: [
           'src/hoodie.js'
         ],
-        dest: 'public/main.js'
+        dest: 'dist/main.js'
       }
     },
     wrapup: {
