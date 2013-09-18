@@ -39,7 +39,8 @@
     "karma-phantomjs-launcher": "~0.1.0",
     "karma-mocha": "~0.1.0",
     "grunt-browserify": "~1.2.4",
-    "grunt-wrapup": "0.0.2"
+    "grunt-wrapup": "0.0.2",
+    "browserify": "~2.31.0"
   },
   "scripts": {
     "test": "grunt test --verbose",
