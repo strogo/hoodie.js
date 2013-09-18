@@ -33,8 +33,6 @@ console.log(account);
 function Hoodie(baseUrl) {
   var hoodie = this;
 
-
-
   // enforce initialization with `new`
   if (!(hoodie instanceof Hoodie)) {
     throw new Error('usage: new Hoodie(url);');
@@ -90,7 +88,7 @@ function Hoodie(baseUrl) {
 
 
   // * hoodie.request
-  this.request = request.request;
+  this.request = request;
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
@@ -98,28 +96,28 @@ function Hoodie(baseUrl) {
   this.checkConnection = connection.checkConnection;
 
   // * hoodie.uuid
-  this.UUID = UUID.uuid;
+  this.UUID = UUID;
 
   // * hoodie.dispose
-  this.dispose = dispose.dispose;
+  this.dispose = dispose;
 
   // * hoodie.open
-  this.open = open.open;
+  this.open = open;
 
   // * hoodie.store
-  this.store = store.store;
+  this.store = store;
 
   // * hoodie.task
-  this.task = task.task;
+  this.task = task;
 
   // * hoodie.config
-  this.config = config.config;
+  this.config = config;
 
   // * hoodie.account
-  this.account = account.account;
+  this.account = account;
 
   // * hoodie.remote
-  this.remote = remote.remote;
+  this.remote = remote;
 
 
   //
@@ -133,7 +131,7 @@ function Hoodie(baseUrl) {
   account.checkPasswordReset();
 
   // clear config on sign out
-  this.on('account:signout', hoodie.config.clear);
+  this.on('account:signout', config.clear);
 
   // hoodie.store
   this.store.patchIfNotPersistant();
@@ -154,8 +152,8 @@ function Hoodie(baseUrl) {
   });
 
   // check connection when browser goes online / offline
-  window.addEventListener('online', hoodie.checkConnection, false);
-  window.addEventListener('offline', hoodie.checkConnection, false);
+  window.addEventListener('online', this.checkConnection, false);
+  window.addEventListener('offline', this.checkConnection, false);
 
   // start checking connection
   this.checkConnection();
@@ -198,5 +196,4 @@ function applyExtensions(hoodie) {
 }
 
 module.exports = Hoodie;
-
 window.Hoodie = Hoodie;
