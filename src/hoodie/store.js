@@ -57,7 +57,7 @@ module.exports = (function (options) {
 
 
   // public API
-  var api = function api(type, id) {
+  var api = function (type, id) {
 
     var scopedOptions = $.extend(true, {
       type: type,
@@ -267,7 +267,7 @@ module.exports = (function (options) {
     // promise decorations get lost when piped through `then`,
     // that's why we need to decorate the find's promise again.
     var promise = api.find(type, id).then(handleFound);
-    return decoratePromise( promise );
+    return decoratePromise(promise);
   };
 
 
@@ -284,7 +284,7 @@ module.exports = (function (options) {
     }
 
     var promise = api.update(type, id, objectUpdate, options).then(null, handleNotFound);
-    return decoratePromise( promise );
+    return decoratePromise(promise);
   };
 
 
@@ -340,7 +340,7 @@ module.exports = (function (options) {
       return $.when.apply(null, _updatePromises);
     });
 
-    return decoratePromise( promise );
+    return decoratePromise(promise);
   };
 
 
@@ -377,7 +377,7 @@ module.exports = (function (options) {
 
   // required backend methods
   // -------------------------
-  if (!options.backend ) {
+  if (!options.backend) {
     throw new Error('options.backend must be passed');
   }
 

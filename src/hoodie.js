@@ -30,6 +30,7 @@ var account = require('./hoodie/account');
 //     // init a new hoodie instance
 //     hoodie = new Hoodie
 //
+
 function Hoodie(baseUrl) {
   var hoodie = this;
 
@@ -131,7 +132,7 @@ function Hoodie(baseUrl) {
   this.account.checkPasswordReset();
 
   // clear config on sign out
-  this.on('account:signout', config.clear);
+  events.on('account:signout', config.clear);
 
   // hoodie.store
   this.store.patchIfNotPersistant();
