@@ -97,37 +97,19 @@ module.exports = function(grunt) {
 
     browserify: {
       build: {
-        src: [
-          'src/hoodie.js'
-        ],
-        dest: 'dist/main.js',
+        src: ['src/hoodie.js'],
+        dest: 'dist/hoodie.js',
+        standalone: 'Hoodie',
+        debug: true,
         options: {
-          shim: {
-            jQuery: {
-              path: 'lib/jquery/jquery.js',
-              exports: '$'
-            }
-          }
-        }
-      }
-    },
-
-    wrapup: {
-      build: {
-        requires: {
-          'public/main.js': true
-        },
-        options: {
-          compress: false,
-          output: 'dist/built.js',
-          globalize: 'Hoodie'
+          alias: 'lib/jquery/jquery.js:jquery',
+          external: 'lib/jquery/jquery.js'
         }
       }
     }
 
   });
 
-  grunt.loadNpmTasks('grunt-wrapup');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -135,6 +117,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-groc');
   grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-wrapup');
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
   grunt.registerTask('build', ['jshint', 'shell:test', 'concat', 'uglify']);

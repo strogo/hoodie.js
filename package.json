@@ -38,9 +38,9 @@
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-phantomjs-launcher": "~0.1.0",
     "karma-mocha": "~0.1.0",
-    "grunt-browserify": "~1.2.4",
+    "grunt-browserify": "~1.2.9",
     "grunt-wrapup": "0.0.2",
-    "browserify": "~2.31.0"
+    "browserify": "~2.34.3"
   },
   "scripts": {
     "test": "grunt test --verbose",

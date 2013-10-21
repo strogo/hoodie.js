@@ -1,5 +1,4 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"2/8Sf6":[function(require,module,exports){
-var global=self;(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
  * jQuery JavaScript Library v1.10.2
  * http://jquery.com/
@@ -9790,10 +9789,6 @@ if ( typeof module === "object" && module && typeof module.exports === "object" 
 
 })( window );
 
-; browserify_shim__define__module__export__(typeof $ != "undefined" ? $ : window.$);
-
-}).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
-
 },{}],2:[function(require,module,exports){
 var process=require("__browserify_process");if (!process.EventEmitter) process.EventEmitter = function () {};
 
@@ -10590,7 +10585,6 @@ function applyExtensions(hoodie) {
   }
 }
 
-module.exports = Hoodie;
 window.Hoodie = Hoodie;
 
 },{"./hoodie/account":6,"./hoodie/config":7,"./hoodie/connection":8,"./hoodie/dispose":9,"./hoodie/events":11,"./hoodie/open":12,"./hoodie/promises":13,"./hoodie/remote_store":14,"./hoodie/request":15,"./hoodie/store":18,"./hoodie/task":19,"./hoodie/uuid":21}],6:[function(require,module,exports){
@@ -12041,7 +12035,7 @@ module.exports = function (options) {
 
 // Open stores
 // -------------
-var $ = require('jQuery');
+var $ = require('jquery');
 var remoteStoreApi = require('./store');
 
 module.exports = function hoodieOpen() {
@@ -12073,7 +12067,7 @@ module.exports = function hoodieOpen() {
 };
 
 
-},{"./store":18,"jQuery":"2/8Sf6"}],13:[function(require,module,exports){
+},{"./store":18,"jquery":"2/8Sf6"}],13:[function(require,module,exports){
 // Hoodie Defers / Promises
 // ------------------------
 
@@ -13896,7 +13890,7 @@ module.exports = function () {
 };
 
 
-},{"./account":6,"./events":11,"./promises":13,"./scoped_task":17,"./store":18}],"jQuery":[function(require,module,exports){
+},{"./account":6,"./events":11,"./promises":13,"./scoped_task":17,"./store":18}],"jquery":[function(require,module,exports){
 module.exports=require('2/8Sf6');
 },{}],21:[function(require,module,exports){
 /* exported hoodieUUID */
