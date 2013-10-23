@@ -2,7 +2,6 @@
 
 // Open stores
 // -------------
-var $ = require('jquery');
 var remoteStoreApi = require('./store');
 
 module.exports = function hoodieOpen() {
