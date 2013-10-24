@@ -844,10 +844,10 @@ function hoodieStore (hoodie) {
   // like add:task, change:note:abc4567, remove, etc.
   function triggerEvents(eventName, object, options) {
     store.trigger(eventName, $.extend(true, {}, object), options);
-    store.trigger('' + eventName + ':' + object.type, $.extend(true, {}, object), options);
+    store.trigger(object.type + ':' + eventName, $.extend(true, {}, object), options);
 
     if (eventName !== 'new') {
-      store.trigger('' + eventName + ':' + object.type + ':' + object.id, $.extend(true, {}, object), options);
+      store.trigger( object.type + ':' + object.id+ ':' + eventName, $.extend(true, {}, object), options);
     }
 
     // sync events have no changes, so we don't trigger
@@ -857,10 +857,10 @@ function hoodieStore (hoodie) {
     }
 
     store.trigger('change', eventName, $.extend(true, {}, object), options);
-    store.trigger('change:' + object.type, eventName, $.extend(true, {}, object), options);
+    store.trigger(object.type + ':change', eventName, $.extend(true, {}, object), options);
 
     if (eventName !== 'new') {
-      store.trigger('change:' + object.type + ':' + object.id, eventName, $.extend(true, {}, object), options);
+      store.trigger(object.type + ':' + object.id + ':change', eventName, $.extend(true, {}, object), options);
     }
   }
 
